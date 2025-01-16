@@ -1,0 +1,118 @@
+--filter by job title and year, additional ordered from min to max
+SELECT
+	SALARY_IN_USD AS ML_ENG_SALARRY,
+	YEAR,
+	JOB_TITLE
+FROM
+	SALARIES
+WHERE
+	YEAR = '2023'
+	AND JOB_TITLE = 'ML Engineer'
+ORDER BY
+	SALARY_IN_USD ASC
+LIMIT
+	10;
+
+--filter by job title and min salary 
+SELECT
+	COMPANY_LOCATION,
+	MIN(SALARY_IN_USD) AS MIN_SALARY,
+	JOB_TITLE
+FROM
+	SALARIES
+WHERE
+	JOB_TITLE = 'Data Scientist'
+GROUP BY
+	COMPANY_LOCATION,
+	JOB_TITLE
+LIMIT
+	1;
+
+--filter by fully remote 
+SELECT
+	REMOTE_RATIO,
+	SALARY_IN_USD AS MAX_SALARY,
+	JOB_TITLE
+FROM
+	SALARIES
+WHERE
+	-- '100' -- fully remote
+	REMOTE_RATIO = 100
+ORDER BY
+	MAX_SALARY DESC
+LIMIT
+	5;
+
+--list of uniq values
+SELECT
+	COUNT(DISTINCT EXP_LEVEL)
+FROM
+	SALARIES
+LIMIT
+	1;
+
+--count uniq values
+SELECT DISTINCT
+	EXP_LEVEL
+FROM
+	SALARIES
+LIMIT
+	20;
+
+-- avg, min, max salary
+SELECT
+	COMPANY_LOCATION,
+	ROUND(AVG(SALARY_IN_USD), 2) AS AVG_SALARY_USD,
+	MIN(SALARY_IN_USD) AS MIN_SALARY_USD,
+	MAX(SALARY_IN_USD) AS MAX_SALARY_USD
+FROM
+	SALARIES
+GROUP BY
+	COMPANY_LOCATION
+ORDER BY
+	MAX_SALARY_USD DESC
+LIMIT
+	5;
+
+-- usd in uah, top 5 
+SELECT
+	SALARY_IN_USD,
+	SALARY_IN_USD * 42.32 AS SALARY_IN_UAH,
+	YEAR,
+	JOB_TITLE
+FROM
+	SALARIES
+WHERE
+	JOB_TITLE = 'ML Engineer'
+	AND YEAR = 2023
+ORDER BY
+	1 DESC
+LIMIT
+	5;
+
+-- two-digit fraction
+SELECT DISTINCT
+	ROUND((REMOTE_RATIO / 100.0), 2) AS REMOTE_FRAC
+FROM
+	SALARIES;
+
+-- additional column with extended level name
+SELECT
+	*
+	-- 'SE' - senior
+	-- 'ME' - Middle
+	-- 'Other'
+,
+	CASE
+		WHEN EXP_LEVEL = 'SE' THEN 'Senior'
+		WHEN EXP_LEVEL = 'MI' THEN 'Middle'
+		WHEN EXP_LEVEL = 'EN' THEN 'Entry'
+		ELSE 'Other'
+	END AS EXP_FULL_LEVEL
+FROM
+	SALARIES
+LIMIT
+	10;
+
+
+
