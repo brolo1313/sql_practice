@@ -8,31 +8,35 @@ LIMIT 10;
 /*Запит виводить ідентифікатор, ім'я та прізвище клієнтів, 
 які мають принаймні три різних жанри серед усіх треків, які вони придбали, разом із кількістю різних жанрів для кожного клієнта.
 */
-SELECT 
+-- WITH CTE — Common Table Expression
+WITH melomaniacs AS (
+
+	SELECT 
 		c.CustomerId 
-		,
-	c.FirstName 
-		,
-	c.LastName 
-		,
-	COUNT(DISTINCT g.GenreId) As nmb_genres
-FROM
-	InvoiceLine il
-LEFT JOIN Track t ON
-	il.TrackId = t.TrackId
-LEFT JOIN Genre g ON
-	t.GenreId = g.GenreId
-LEFT JOIN Invoice i ON
-	il.InvoiceId = i.InvoiceId
-LEFT JOIN Customer c ON
-	i.CustomerId = c.CustomerId
-GROUP BY
-	1,
-	2,
-	3
-HAVING
-	COUNT(DISTINCT g.GenreId) >= 3
-	
+		, c.FirstName 
+		, c.LastName 
+		, COUNT(DISTINCT g.GenreId) As nmb_genres
+	FROM InvoiceLine il 
+	LEFT JOIN Track t ON il.TrackId = t.TrackId 
+	LEFT JOIN Genre g ON t.GenreId = g.GenreId 
+	LEFT JOIN Invoice i ON il.InvoiceId = i.InvoiceId 
+	LEFT JOIN Customer c ON i.CustomerId = c.CustomerId 
+	GROUP BY 1,2,3
+	HAVING COUNT(DISTINCT g.GenreId) >= 3
+)
+
+, invoices AS (
+
+	SELECT *
+	FROM Invoice i 
+	WHERE InvoiceDate BETWEEN '2009-01-01' AND '2010-01-01' AND i.InvoiceId 
+)
+
+SELECT *
+FROM melomaniacs m
+--WHERE m.CustomerId IN (SELECT CustomerId FROM invoices)
+LEFT JOIN invoices i ON m.CustomerId = i.CustomerId
+--WHERE i.CustomerId IS NOT NULL AND i.BillingState IS NOT NULL 
 
 	
 -- Вивести кількість рахунків для кожного клієнта
